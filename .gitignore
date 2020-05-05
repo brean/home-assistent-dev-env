@@ -1,0 +1,5 @@
+volumes/mqtt/data/mosquitto.db
+volumes/mqtt/log/mosquitto.log
+volumes/home_assistant/config/home-assistant_v2.db
+example_sensor/__pycache__/
+volumes/home_assistant/config/home-assistant.log

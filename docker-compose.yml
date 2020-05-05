@@ -1,0 +1,62 @@
+version: '3'
+
+services:
+  home_assistant:
+    image: homeassistant/home-assistant:${HASS_VERSION}
+    depends_on:
+    - mqtt
+    volumes:
+    - ./volumes/home_assistant/config:/config
+    - ./example_sensor:/config/custom_components/example_sensor
+    networks:
+    - home
+    - mqtt
+
+  nginx:
+    image: nginx:latest
+    container_name: home_nginx
+    restart: always
+    depends_on:
+      - home_assistant
+    ports:
+      - 80:80
+    volumes:
+      - ./config/nginx/nginx.conf:/etc/nginx/nginx.conf
+    networks:
+      - home
+      - testing
+
+  mqtt:
+    image: eclipse-mosquitto:latest
+    container_name: mosquitto
+    restart: always
+    ports:
+      - 1883:1833 # mqtt
+      - 9001:9001 # Websocket mqtt
+    volumes:
+      - ./volumes/mqtt/config/mosquitto.conf:/mosquitto/config/mosquitto.conf
+      - ./volumes/mqtt/data:/mosquitto/data
+      - ./volumes/mqtt/log:/mosquitto/log
+    networks:
+      - mqtt
+
+  testing:
+    build:
+      context: ./docker-python-chromedriver
+      dockerfile: Dockerfile
+    image: python-selenium
+    volumes:
+      - ./test:/app/test
+    working_dir: /app/
+    depends_on:
+      - home_assistant
+      - nginx
+    command: ['python', '-m', 'pytest', 'test']
+    # command: ['ls', '-al', '/app']
+    networks:
+      - testing
+
+networks:
+  home:
+  testing:
+  mqtt:

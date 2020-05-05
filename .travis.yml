@@ -1,0 +1,15 @@
+dist: bionic
+language: python
+
+python:
+  - "3.8"
+
+services:
+  - docker
+
+script:
+  - docker-compose build
+  - docker-compose run testing
+
+after-script:
+  - docker-compose down
