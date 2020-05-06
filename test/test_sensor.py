@@ -3,13 +3,14 @@
 
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
+import time
 
 
 LOVELACE_USERNAME='user'
 LOVELACE_PASSWORD='1234'
 # This should be the nginx-docker container name, see docker-compose file.
 LOGIN_URL='http://nginx'
-HASS_STARTUP_TIME=20
+HASS_STARTUP_TIME=5
 
 
 def setup():
@@ -19,8 +20,7 @@ def setup():
     options.add_argument('--headless')
     options.add_argument('--disable-gpu')
     driver = webdriver.Chrome(options=options)
-    # wait for home-assistant to start up
-    driver.implicitly_wait(HASS_STARTUP_TIME)
+    driver.implicitly_wait(5)
     return driver
 
 
@@ -38,7 +38,13 @@ def get_from_shadow(driver, elem, qry):
 
 def login(driver, user=LOVELACE_USERNAME, passwd=LOVELACE_PASSWORD):
     """execute login on main page."""
-    driver.get(LOGIN_URL)
+    for i in range(10):
+        driver.get(LOGIN_URL)
+        if driver.title != '502 Bad Gateway':
+            break
+        time.sleep(HASS_STARTUP_TIME)
+    if i >= 9:
+        assert False, 'can not start home assistant: Bad Gateway, check nginx'
     qry = [
         'ha-authorize',
         'ha-auth-flow',
@@ -62,6 +68,8 @@ def login(driver, user=LOVELACE_USERNAME, passwd=LOVELACE_PASSWORD):
     pass_input.send_keys(LOVELACE_PASSWORD)
 
     pass_input.send_keys(Keys.RETURN)
+
+    # wait for the sensor to actually send some data
 
 
 def test_sensor():
@@ -89,8 +97,13 @@ def test_sensor():
             continue
 
         sensor = expand_shadow_element(driver, sensor[0])
-        sensor_value = sensor.find_element_by_css_selector('div.value span')
-        found_sensor = int(sensor_value.text) == 23
+        for i in range(10):
+            sensor_value = sensor.find_element_by_css_selector('div.value span')
+            if sensor_value.text == '-':
+                time.sleep(2)
+                continue
+            found_sensor = int(sensor_value.text) == 23
+            break
 
     assert found_sensor, 'sensor not found in badges'
     
