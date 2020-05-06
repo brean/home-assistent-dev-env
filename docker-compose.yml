@@ -41,6 +41,7 @@ services:
       - mqtt
 
   testing:
+    tty: true
     build:
       context: ./docker-python-chromedriver
       dockerfile: Dockerfile
@@ -51,7 +52,7 @@ services:
     depends_on:
       - home_assistant
       - nginx
-    command: ['python', '-m', 'pytest', 'test']
+    command: ['python', '-u', '-m', 'pytest', 'test']
     networks:
       - testing
 
