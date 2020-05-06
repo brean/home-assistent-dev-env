@@ -9,7 +9,7 @@ LOVELACE_USERNAME='user'
 LOVELACE_PASSWORD='1234'
 # This should be the nginx-docker container name, see docker-compose file.
 LOGIN_URL='http://nginx'
-HASS_STARTUP_TIME=1
+HASS_STARTUP_TIME=10
 
 
 def setup():
