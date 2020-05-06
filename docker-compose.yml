@@ -52,7 +52,6 @@ services:
       - home_assistant
       - nginx
     command: ['python', '-m', 'pytest', 'test']
-    # command: ['ls', '-al', '/app']
     networks:
       - testing
 
