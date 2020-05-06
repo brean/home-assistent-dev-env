@@ -2,6 +2,8 @@
 
 Docker based home assistent development environment to create Hass-Components (travis-ci for integration testing).
 
+[![Build Status](https://travis-ci.org/brean/home-assistent-dev-env.svg?branch=master)](https://travis-ci.org/brean/home-assistent-dev-env)
+
 ## Overview
 
 This system consists of 3 docker container:
