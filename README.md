@@ -6,7 +6,7 @@ Docker based home assistent development environment to create Hass-Components (t
 
 ## Overview
 
-This system consists of 3 docker container:
+This system consists of 4 docker container:
 
 - **home_assistant** container for a home assistant instance
 - **nginx** a webserver to allow access to home-assistant from the host system.
